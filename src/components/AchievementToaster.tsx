@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../store';
 import { motion, AnimatePresence } from 'motion/react';
 import { Trophy } from 'lucide-react';
@@ -6,25 +6,24 @@ import { Trophy } from 'lucide-react';
 export const AchievementToaster: React.FC = () => {
   const achievements = useGameStore(s => s.achievements);
   const [queue, setQueue] = useState<{ id: string; text: string }[]>([]);
-
-  const isInitialMount = useRef(true);
+  const previousCount = useRef(achievements.length);
 
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
+    if (achievements.length <= previousCount.current) {
+      previousCount.current = achievements.length;
       return;
     }
     
-    if (achievements.length > 0) {
-      const latest = achievements[achievements.length - 1];
-      const id = Math.random().toString(36).substring(2, 11);
-      setQueue(prev => [...prev, { id, text: latest }]);
+    const latestAchievements = achievements.slice(previousCount.current);
+    previousCount.current = achievements.length;
 
-      // Remove after 4 seconds
+    latestAchievements.forEach((text) => {
+      const id = Math.random().toString(36).substring(2, 11);
+      setQueue(prev => [...prev, { id, text }]);
       setTimeout(() => {
         setQueue(prev => prev.filter(a => a.id !== id));
       }, 4000);
-    }
+    });
   }, [achievements]);
 
   return (
@@ -42,7 +41,7 @@ export const AchievementToaster: React.FC = () => {
               <Trophy size={14} className="fill-current" />
             </div>
             <div>
-              <div className="text-[9px] font-bold uppercase tracking-widest text-[#fbbc04] mb-0.5">Achievement Unlocked</div>
+              <div className="text-[9px] font-bold uppercase tracking-widest text-[#fbbc04] mb-0.5">Pencapaian Terbuka</div>
               <div className="text-sm font-bold text-white leading-none">{item.text}</div>
             </div>
           </motion.div>

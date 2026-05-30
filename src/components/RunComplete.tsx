@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { useGameStore } from '../store';
+import { Coffee, Heart } from 'lucide-react';
+import { RunResult, useGameStore } from '../store';
 import { playCheckpointSFX, playVroomSFX } from '../utils/audio';
 
 const PAIR_FLAGS: Record<string, string> = {
@@ -60,16 +61,16 @@ const ConfettiCanvas: React.FC = () => {
 };
 
 // Generate share text
-function buildShareText(result: NonNullable<ReturnType<typeof useGameStore>['lastRunResult']>): string {
+function buildShareText(result: RunResult): string {
   const flag = PAIR_FLAGS[result.pair] || '🏁';
-  return `🏎️ I drove ${flag} ${result.pair} for ${result.distance.toLocaleString()}m in Incartion!\n`
-    + `🏆 Score: ${result.score.toLocaleString()} | 🪙 Coins: ${result.runCoins}\n`
-    + `🏁 Checkpoints: ${result.checkpoints} | ⚡ Crisis zones survived: ${result.crisisZonesSurvived}\n`
-    + `Try to beat me → https://incartion.game #Incartion #LiterasiKeuangan`;
+  return `🏎️ Aku melaju di ${flag} ${result.pair} sejauh ${result.distance.toLocaleString()}m di FINCARS!\n`
+    + `🏆 Skor: ${result.score.toLocaleString()} | 🪙 Koin: ${result.runCoins}\n`
+    + `🏁 Pos cek: ${result.checkpoints} | ⚡ Zona krisis dilewati: ${result.crisisZonesSurvived}\n`
+    + `Buatan Anak Bangsa. Dukung kreatornya: https://saweria.co/ardelyo #FINCARS #LiterasiKeuangan`;
 }
 
 // Draw share card on canvas and trigger download
-async function downloadShareCard(result: NonNullable<ReturnType<typeof useGameStore>['lastRunResult']>) {
+async function downloadShareCard(result: RunResult) {
   const W = 600, H = 320;
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
@@ -98,14 +99,14 @@ async function downloadShareCard(result: NonNullable<ReturnType<typeof useGameSt
   // Subtitle
   ctx.font = '400 15px "Google Sans", sans-serif';
   ctx.fillStyle = '#9aa0a6';
-  ctx.fillText('Incartion — Drive Through Market History', 32, 88);
+  ctx.fillText('FINCARS - Jelajahi Sejarah Pasar', 32, 88);
 
   // Stats grid
   const stats = [
-    { label: '📏 Distance', value: `${result.distance.toLocaleString()}m` },
-    { label: '🏆 Score', value: result.score.toLocaleString() },
-    { label: '🪙 Coins', value: result.runCoins.toLocaleString() },
-    { label: '🏁 Checkpoints', value: String(result.checkpoints) },
+    { label: '📏 Jarak', value: `${result.distance.toLocaleString()}m` },
+    { label: '🏆 Skor', value: result.score.toLocaleString() },
+    { label: '🪙 Koin', value: result.runCoins.toLocaleString() },
+    { label: '🏁 Pos Cek', value: String(result.checkpoints) },
   ];
   stats.forEach((s, i) => {
     const col = i % 2;
@@ -128,28 +129,28 @@ async function downloadShareCard(result: NonNullable<ReturnType<typeof useGameSt
   ctx.font = '500 13px "Google Sans", sans-serif';
   ctx.fillStyle = '#8ab4f8';
   ctx.textAlign = 'center';
-  ctx.fillText('Beat me at incartion.game  ·  #Incartion', W / 2, H - 20);
+  ctx.fillText('Buatan Anak Bangsa · saweria.co/ardelyo', W / 2, H - 20);
 
   // Download
   const url = canvas.toDataURL('image/png');
   const a = document.createElement('a');
   a.href = url;
-  a.download = `incartion-${result.pair.replace('/', '-')}.png`;
+  a.download = `fincars-${result.pair.replace('/', '-')}.png`;
   a.click();
 }
 
-async function nativeShare(result: NonNullable<ReturnType<typeof useGameStore>['lastRunResult']>) {
+async function nativeShare(result: RunResult) {
   const text = buildShareText(result);
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'Incartion Run Result', text });
+      await navigator.share({ title: 'Hasil Balapan FINCARS', text });
       return;
     } catch {}
   }
   // Fallback: copy to clipboard
   try {
     await navigator.clipboard.writeText(text);
-    alert('Share text copied to clipboard! Paste it anywhere to share.');
+    alert('Teks hasil sudah disalin. Tinggal tempel untuk berbagi.');
   } catch {
     // last resort
     downloadShareCard(result);
@@ -183,9 +184,9 @@ export const RunComplete: React.FC = () => {
     );
 
   return (
-    <div className="fixed inset-0 bg-[#202124]/95 backdrop-blur-sm z-[200] flex items-center justify-center p-4 font-sans">
+    <div className="fixed inset-0 bg-[#202124]/95 backdrop-blur-sm z-[200] flex items-center justify-center p-4 font-sans overflow-y-auto">
       <ConfettiCanvas />
-      <div className="relative z-10 w-full max-w-sm">
+      <div className="relative z-10 w-full max-w-sm my-auto">
         {/* Header card */}
         <motion.div
           initial={{ opacity: 0, y: -30, scale: 0.9 }}
@@ -197,9 +198,9 @@ export const RunComplete: React.FC = () => {
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#4285f4] via-[#81c995] to-[#fbbc04]" />
 
           <div className="text-5xl mb-2">🏁</div>
-          <h2 className="text-2xl font-black text-white tracking-tight">Run Complete!</h2>
+          <h2 className="text-2xl font-black text-white tracking-tight">Balapan Selesai!</h2>
           <p className="text-[#9aa0a6] text-sm mt-1">
-            {flag} {result.pair} · {result.timeRange === 'MAX' ? 'MAX History' : result.timeRange}
+            {flag} {result.pair} · {result.timeRange === 'MAX' ? 'Riwayat MAX' : result.timeRange}
           </p>
 
           {/* Score big display */}
@@ -209,17 +210,17 @@ export const RunComplete: React.FC = () => {
             transition={{ delay: 0.3, type: 'spring', bounce: 0.5 }}
             className="mt-4 bg-[#8ab4f8]/10 border border-[#8ab4f8]/20 rounded-xl py-3 px-4"
           >
-            <p className="text-[10px] uppercase tracking-widest text-[#8ab4f8] font-semibold mb-0.5">Final Score</p>
+            <p className="text-[10px] uppercase tracking-widest text-[#8ab4f8] font-semibold mb-0.5">Skor Akhir</p>
             <p className="text-4xl font-black text-[#8ab4f8]">{result.score.toLocaleString()}</p>
           </motion.div>
         </motion.div>
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <StatCard icon="📏" label="Distance" value={`${result.distance.toLocaleString()}m`} delay={0.1} />
-          <StatCard icon="🪙" label="Coins Earned" value={result.runCoins} color="#fbbc04" delay={0.15} />
-          <StatCard icon="🏁" label="Checkpoints" value={result.checkpoints} color="#81c995" delay={0.2} />
-          <StatCard icon="⚡" label="Crisis Zones" value={`${result.crisisZonesSurvived} survived`} color="#f29900" delay={0.25} />
+          <StatCard icon="📏" label="Jarak" value={`${result.distance.toLocaleString()}m`} delay={0.1} />
+          <StatCard icon="🪙" label="Koin Didapat" value={result.runCoins} color="#fbbc04" delay={0.15} />
+          <StatCard icon="🏁" label="Pos Cek" value={result.checkpoints} color="#81c995" delay={0.2} />
+          <StatCard icon="⚡" label="Zona Krisis" value={`${result.crisisZonesSurvived} dilewati`} color="#f29900" delay={0.25} />
         </div>
 
         {/* Total coins update */}
@@ -229,9 +230,33 @@ export const RunComplete: React.FC = () => {
           transition={{ delay: 0.4 }}
           className="bg-[#292a2d] border border-[#fbbc04]/20 rounded-xl p-3 mb-4 flex items-center justify-between"
         >
-          <span className="text-xs text-[#9aa0a6]">Total lifetime coins</span>
+          <span className="text-xs text-[#9aa0a6]">Total koin sepanjang main</span>
           <span className="text-sm font-bold text-[#fbbc04]">🪙 {store.totalCoins.toLocaleString()}</span>
         </motion.div>
+
+        <motion.a
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.43 }}
+          href="https://saweria.co/ardelyo"
+          target="_blank"
+          rel="noreferrer"
+          className="group mb-4 block rounded-xl border border-[#fbbc04]/25 bg-gradient-to-r from-[#fbbc04]/12 via-[#292a2d] to-[#8ab4f8]/10 p-3 text-left hover:border-[#fbbc04]/60 hover:bg-[#fbbc04]/15 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-[#fbbc04]/20 text-[#fbbc04] flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Coffee size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 text-sm font-black text-white">
+                Buatan Anak Bangsa <Heart size={13} className="fill-[#f28b82] text-[#f28b82]" />
+              </div>
+              <p className="text-[11px] text-[#9aa0a6] leading-snug">
+                Kalau lintasan ini bikin kamu senyum, traktir kreatornya kopi di <span className="text-[#fbbc04] font-bold">saweria.co/ardelyo</span>.
+              </p>
+            </div>
+          </div>
+        </motion.a>
 
         {/* Action buttons */}
         <div className="flex flex-col gap-3">
@@ -243,7 +268,7 @@ export const RunComplete: React.FC = () => {
             onClick={() => nativeShare(result)}
             className="w-full py-3.5 rounded-xl bg-[#8ab4f8] text-[#202124] font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#aecbfa] transition-colors"
           >
-            📱 Share My Result
+            📱 Bagikan Hasil
           </motion.button>
 
           <motion.button
@@ -254,7 +279,7 @@ export const RunComplete: React.FC = () => {
             onClick={() => downloadShareCard(result)}
             className="w-full py-3 rounded-xl bg-[#303134] text-[#e8eaed] font-medium text-sm flex items-center justify-center gap-2 hover:bg-[#3c4043] transition-colors border border-[#3c4043]"
           >
-            🖼️ Download Share Card
+            🖼️ Unduh Kartu Hasil
           </motion.button>
 
           <div className="flex gap-3">
@@ -266,7 +291,7 @@ export const RunComplete: React.FC = () => {
               onClick={() => { playVroomSFX(); store.resetRun(); }}
               className="flex-1 py-3 rounded-xl bg-[#303134] text-[#8ab4f8] font-bold text-sm flex items-center justify-center gap-1.5 hover:bg-[#3c4043] transition-colors border border-[#3c4043]"
             >
-              ↺ Play Again
+              ↺ Main Lagi
             </motion.button>
             <motion.button
               initial={{ opacity: 0, y: 10 }}

@@ -50,12 +50,7 @@ export default function App() {
         </>
       )}
 
-      {gameScreen === 'COMPLETE' && (
-        <>
-          <GameCanvas />
-          <RunComplete />
-        </>
-      )}
+      {gameScreen === 'COMPLETE' && <RunComplete />}
       
       <TermsModal isOpen={isTermsOpen} onClose={handleAcceptTerms} />
     </div>

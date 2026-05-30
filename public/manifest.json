@@ -1,7 +1,7 @@
 {
-  "name": "Incartion",
-  "short_name": "Incartion",
-  "description": "Drive through market history. Learn as you go.",
+  "name": "FINCARS",
+  "short_name": "FINCARS",
+  "description": "Jelajahi sejarah pasar. Belajar sambil melaju.",
   "start_url": "/",
   "display": "fullscreen",
   "background_color": "#202124",

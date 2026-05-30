@@ -16,12 +16,12 @@ export interface RunResult {
 
 function loadTotalCoins(): number {
   try {
-    return parseInt(localStorage.getItem('incartion_total_coins') || '0', 10) || 0;
+    return parseInt(localStorage.getItem('fincars_total_coins') || localStorage.getItem('incartion_total_coins') || '0', 10) || 0;
   } catch { return 0; }
 }
 
 function saveTotalCoins(n: number) {
-  try { localStorage.setItem('incartion_total_coins', String(n)); } catch {}
+  try { localStorage.setItem('fincars_total_coins', String(n)); } catch {}
 }
 
 interface GameState {
@@ -64,14 +64,13 @@ interface GameState {
   
   // API Configuration
   apiProvider: string;
-  apiKey: string;
   
   // Run Data
   // Actions
   setGameScreen: (screen: GameScreen) => void;
   setCurrencyPair: (pair: string) => void;
   setTimeRange: (range: TimeRange) => void;
-  setApiConfig: (provider: string, key: string) => void;
+  setApiConfig: (provider: string) => void;
   updateMarketData: (price: number, change: number) => void;
   updateGameStats: (stats: Partial<{ runCoins: number; fuel: number; distance: number; score: number; checkpointsPassed: number; crisisZonesSurvived: number }>) => void;
   awardCoins: (amount: number) => void;    // Awards to both run + total
@@ -88,17 +87,21 @@ interface GameState {
 
 function loadProfile() {
   try {
-    const raw = localStorage.getItem('incartion_profile');
+    const raw = localStorage.getItem('fincars_profile') || localStorage.getItem('incartion_profile');
     if (raw) return JSON.parse(raw);
   } catch {}
   return { unlockedSkins: ['default'], selectedSkin: 'default', bestScores: {}, achievements: [] };
 }
 
 function saveProfile(profile: any) {
-  try { localStorage.setItem('incartion_profile', JSON.stringify(profile)); } catch {}
+  try { localStorage.setItem('fincars_profile', JSON.stringify(profile)); } catch {}
 }
 
 const initialProfile = loadProfile();
+
+try {
+  localStorage.removeItem('trading_game_api_key');
+} catch {}
 
 export const useGameStore = create<GameState>((set, get) => ({
   gameScreen: 'MENU',
@@ -123,17 +126,16 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastRunResult: null,
   achievements: initialProfile.achievements,
 
-  apiProvider: localStorage.getItem('trading_game_api_provider') || 'ALPHAVANTAGE',
-  apiKey: localStorage.getItem('trading_game_api_key') || import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || '',
+  apiProvider: localStorage.getItem('trading_game_api_provider') || 'DEFAULT',
 
   setGameScreen: (screen) => set({ gameScreen: screen }),
   setCurrencyPair: (pair) => set({ currencyPair: pair }),
   setTimeRange: (range) => set({ timeRange: range }),
   
-  setApiConfig: (provider, key) => {
+  setApiConfig: (provider) => {
     localStorage.setItem('trading_game_api_provider', provider);
-    localStorage.setItem('trading_game_api_key', key);
-    set({ apiProvider: provider, apiKey: key });
+    localStorage.removeItem('trading_game_api_key');
+    set({ apiProvider: provider });
   },
 
   updateMarketData: (price, change) => set({ 

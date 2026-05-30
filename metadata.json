@@ -1,6 +1,6 @@
 {
-  "name": "Fincars",
-  "description": "A mobile-first financial game where real-time currency exchange rate graphs become physical terrain that your car drives on.",
+  "name": "FINCARS",
+  "description": "Game finansial mobile-first buatan anak bangsa, tempat grafik nilai tukar menjadi lintasan yang kamu lewati.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

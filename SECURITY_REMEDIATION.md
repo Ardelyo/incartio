@@ -1,4 +1,4 @@
-# Security Remediation Guide - Incartion
+# Security Remediation Guide - FINCARS
 
 Quick implementation guide to fix critical security issues.
 

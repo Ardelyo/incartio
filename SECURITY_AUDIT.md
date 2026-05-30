@@ -1,7 +1,7 @@
-# Security Audit Report - Incartion
+# Security Audit Report - FINCARS
 
 **Date:** May 30, 2026  
-**Project:** Incartion (Currency Trading Game)  
+**Project:** FINCARS (Currency Trading Game)  
 **Type:** Security & Data Protection Review
 
 ---

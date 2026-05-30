@@ -14,143 +14,57 @@ export interface PairProfile {
 }
 
 export const PAIR_PROFILES: Record<string, PairProfile> = {
-  'USD/IDR': { pair: 'USD/IDR', basePrice: 16000, volatility: 0.4, color: '#10B981', theme: 'Tropical Island' },
-  'EUR/USD': { pair: 'EUR/USD', basePrice: 1.08, volatility: 0.15, color: '#3B82F6', theme: 'European Cobblestone' },
-  'GBP/JPY': { pair: 'GBP/JPY', basePrice: 191.50, volatility: 0.6, color: '#F59E0B', theme: 'Foggy Highlands' },
-  'USD/JPY': { pair: 'USD/JPY', basePrice: 155.20, volatility: 0.35, color: '#EAB308', theme: 'Neon City' },
-  'BTC/USD': { pair: 'BTC/USD', basePrice: 65000, volatility: 0.9, color: '#8B5CF6', theme: 'Dark Space' },
-  'AUD/USD': { pair: 'AUD/USD', basePrice: 0.66, volatility: 0.25, color: '#F97316', theme: 'Outback Desert' },
+  'USD/IDR': { pair: 'USD/IDR', basePrice: 16000, volatility: 0.4, color: '#10B981', theme: 'Pulau Tropis' },
+  'EUR/USD': { pair: 'EUR/USD', basePrice: 1.08, volatility: 0.15, color: '#3B82F6', theme: 'Batu Kota Eropa' },
+  'GBP/JPY': { pair: 'GBP/JPY', basePrice: 191.50, volatility: 0.6, color: '#F59E0B', theme: 'Dataran Berkabut' },
+  'USD/JPY': { pair: 'USD/JPY', basePrice: 155.20, volatility: 0.35, color: '#EAB308', theme: 'Kota Neon' },
+  'BTC/USD': { pair: 'BTC/USD', basePrice: 65000, volatility: 0.9, color: '#8B5CF6', theme: 'Ruang Gelap' },
+  'AUD/USD': { pair: 'AUD/USD', basePrice: 0.66, volatility: 0.25, color: '#F97316', theme: 'Gurun Outback' },
 };
 
-export async function fetchLivePrice(pair: string, provider: string = 'DEFAULT', apiKey: string = ''): Promise<number | null> {
-  const [base, target] = pair.split('/');
-  if (!base || !target) return null;
+export function isSupportedPair(pair: string): boolean {
+  return Object.prototype.hasOwnProperty.call(PAIR_PROFILES, pair);
+}
 
+export async function fetchLivePrice(pair: string, provider: string = 'DEFAULT'): Promise<number | null> {
+  if (!isSupportedPair(pair)) return null;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 3000);
 
   try {
-    if (provider === 'ALPHAVANTAGE' && apiKey) {
-      const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${base}&to_currency=${target}&apikey=${apiKey}`;
-      const res = await fetch(url, { signal: controller.signal });
-      const data = await res.json();
-      clearTimeout(timeoutId);
-      if (data['Realtime Currency Exchange Rate']) {
-        return parseFloat(data['Realtime Currency Exchange Rate']['5. Exchange Rate']);
-      }
-      return null;
-    }
-
-    if (provider === 'FOREXRATEAPI' && apiKey) {
-      const url = `https://api.forexrateapi.com/v1/latest?api_key=${apiKey}&base=${base}&currencies=${target}`;
-      const res = await fetch(url, { signal: controller.signal });
-      const data = await res.json();
-      clearTimeout(timeoutId);
-      if (data.success && data.rates[target]) {
-        return data.rates[target];
-      }
-      return null;
-    }
-
-    // Default Free Fallback (fawazahmed0)
-    const date = 'latest';
-    const apiVersion = 'v1';
-    const endpoint = `currencies/${base.toLowerCase()}.json`;
-    const urls = [
-      `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/${apiVersion}/${endpoint}`,
-      `https://${date}.currency-api.pages.dev/${apiVersion}/${endpoint}`
-    ];
-
-    for (const url of urls) {
-      try {
-        const response = await fetch(url, { signal: controller.signal });
-        if (response.ok) {
-          const data = await response.json();
-          const price = data[base.toLowerCase()][target.toLowerCase()];
-          if (price !== undefined) {
-             clearTimeout(timeoutId);
-             return price;
-          }
-        }
-      } catch (e) {
-        // try next
-      }
-    }
-  } catch (e) {
-    console.warn(`API Fetch failed for ${provider}`, e);
+    const response = await fetch(
+      `/api/price?pair=${encodeURIComponent(pair)}&provider=${encodeURIComponent(provider)}`,
+      { signal: controller.signal }
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    return typeof data.price === 'number' ? data.price : null;
+  } catch {
+    return null;
   } finally {
     clearTimeout(timeoutId);
   }
-  return null;
 }
 
-export async function fetchHistoricalDataPoints(pair: string, days: number, provider: string = 'DEFAULT', apiKey: string = ''): Promise<DataPoint[]> {
-  const [base, target] = pair.split('/');
-  if (!base || !target) return [];
+export async function fetchHistoricalDataPoints(pair: string, days: number, provider: string = 'DEFAULT'): Promise<DataPoint[]> {
+  if (!isSupportedPair(pair)) return [];
 
-  // If Alpha Vantage is used for historical, we could use FX_DAILY
-  if (provider === 'ALPHAVANTAGE' && apiKey) {
-     try {
-       const url = `https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${base}&to_symbol=${target}&apikey=${apiKey}`;
-       const res = await fetch(url);
-       const data = await res.json();
-       if (data['Time Series FX (Daily)']) {
-         const series = data['Time Series FX (Daily)'];
-         const dates = Object.keys(series).slice(0, days);
-         const points: DataPoint[] = dates.map(d => ({
-           time: new Date(d).getTime(),
-           price: parseFloat(series[d]['4. close'])
-         }));
-         return points.reverse();
-       }
-     } catch (e) {
-       console.warn("AlphaVantage historical failed", e);
-     }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+  try {
+    const response = await fetch(
+      `/api/history?pair=${encodeURIComponent(pair)}&days=${encodeURIComponent(String(days))}&provider=${encodeURIComponent(provider)}`,
+      { signal: controller.signal }
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data.points) ? data.points : [];
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  // Fallback to the original free API
-  const step = Math.max(2, Math.floor(days / 5));
-  const dates: string[] = [];
-  for (let i = days - 1; i >= 1; i -= step) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    dates.push(d.toISOString().split('T')[0]);
-  }
-  dates.push('latest');
-
-  const apiVersion = 'v1';
-  const endpoint = `currencies/${base.toLowerCase()}.json`;
-
-  const fetchDate = async (dateStr: string) => {
-    const urls = [
-      `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateStr}/${apiVersion}/${endpoint}`,
-      `https://${dateStr}.currency-api.pages.dev/${apiVersion}/${endpoint}`
-    ];
-    for (const url of urls) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1500); 
-      try {
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (response.ok) {
-          const data = await response.json();
-          const price = data[base.toLowerCase()][target.toLowerCase()];
-          if (price !== undefined) {
-            return {
-              time: dateStr === 'latest' ? Date.now() : new Date(dateStr).getTime(),
-              price
-            };
-          }
-        }
-      } catch (e) {
-         clearTimeout(timeoutId);
-      }
-    }
-    return null;
-  };
-
-  const results = await Promise.all(dates.map(date => fetchDate(date)));
-  return results.filter((r): r is DataPoint => r !== null);
 }
 
 /**
@@ -340,37 +254,67 @@ export interface CrisisZone {
 
 const CRISIS_ZONES: Record<string, CrisisZone[]> = {
   'USD/IDR': [
-    { label: '🌊 Asian Financial Crisis', description: 'Rupiah turun 80%\ndalam 6 bulan — 1997', startIdx: 5, endIdx: 25, severity: 'EXTREME', year: 1997 },
-    { label: '📉 COVID Crash', description: 'Pandemi global\nguncang pasar — 2020', startIdx: 155, endIdx: 175, severity: 'SEVERE', year: 2020 },
-    { label: '⚡ Post-COVID Rebound', description: 'Fed rate hike\nnaikkan DXY — 2022', startIdx: 185, endIdx: 205, severity: 'MODERATE', year: 2022 },
+    { label: '🌊 Krisis Finansial Asia', description: 'Rupiah turun 80%\ndalam 6 bulan — 1997', startIdx: 5, endIdx: 25, severity: 'EXTREME', year: 1997 },
+    { label: '📉 Kejatuhan COVID', description: 'Pandemi global\nguncang pasar — 2020', startIdx: 155, endIdx: 175, severity: 'SEVERE', year: 2020 },
+    { label: '⚡ Pemulihan Pasca-COVID', description: 'Kenaikan suku bunga Fed\nmengangkat DXY — 2022', startIdx: 185, endIdx: 205, severity: 'MODERATE', year: 2022 },
   ],
   'BTC/USD': [
-    { label: '🐂 First Bull Run', description: 'BTC naik ke $1,000\npertama kali — 2013', startIdx: 18, endIdx: 30, severity: 'MODERATE', year: 2013 },
-    { label: '🔥 Bubble Mania', description: '$19,800 peak — lalu\ncrash 84% — 2017', startIdx: 85, endIdx: 110, severity: 'EXTREME', year: 2017 },
-    { label: '🚀 All-Time High', description: 'BTC capai $69,000\npuncak siklus — 2021', startIdx: 140, endIdx: 165, severity: 'EXTREME', year: 2021 },
-    { label: '🧊 Crypto Winter', description: 'FTX collapse,\n$15k floor — 2022', startIdx: 170, endIdx: 200, severity: 'SEVERE', year: 2022 },
+    { label: '🐂 Bull Run Pertama', description: 'BTC naik ke $1,000\npertama kali — 2013', startIdx: 18, endIdx: 30, severity: 'MODERATE', year: 2013 },
+    { label: '🔥 Mania Gelembung', description: 'Puncak $19,800 — lalu\njatuh 84% — 2017', startIdx: 85, endIdx: 110, severity: 'EXTREME', year: 2017 },
+    { label: '🚀 Rekor Tertinggi', description: 'BTC capai $69,000\npuncak siklus — 2021', startIdx: 140, endIdx: 165, severity: 'EXTREME', year: 2021 },
+    { label: '🧊 Musim Dingin Kripto', description: 'FTX runtuh,\ndasar $15k — 2022', startIdx: 170, endIdx: 200, severity: 'SEVERE', year: 2022 },
   ],
   'EUR/USD': [
-    { label: '🏦 Euro Debt Crisis', description: 'Greece, Italy, Spain:\nIMF bailouts — 2012', startIdx: 70, endIdx: 90, severity: 'SEVERE', year: 2012 },
-    { label: '🗳️ Brexit Shock', description: 'UK votes Leave —\nGBP/EUR shock — 2016', startIdx: 115, endIdx: 130, severity: 'MODERATE', year: 2016 },
-    { label: '📉 COVID Low', description: 'USD surge as\nsafe haven — 2020', startIdx: 155, endIdx: 170, severity: 'MODERATE', year: 2020 },
+    { label: '🏦 Krisis Utang Euro', description: 'Yunani, Italia, Spanyol:\nbailout IMF — 2012', startIdx: 70, endIdx: 90, severity: 'SEVERE', year: 2012 },
+    { label: '🗳️ Guncangan Brexit', description: 'UK memilih keluar —\nGBP/EUR terguncang — 2016', startIdx: 115, endIdx: 130, severity: 'MODERATE', year: 2016 },
+    { label: '📉 Titik Rendah COVID', description: 'USD menguat sebagai\naset aman — 2020', startIdx: 155, endIdx: 170, severity: 'MODERATE', year: 2020 },
   ],
   'USD/JPY': [
-    { label: '🗻 1998 JPY Crisis', description: 'Yen strengthens to 147\ncarry trade unwind', startIdx: 5, endIdx: 20, severity: 'SEVERE', year: 1998 },
-    { label: '🌊 Lost Decade Low', description: 'JPY strongest at 75\nafter 2011 earthquake', startIdx: 70, endIdx: 90, severity: 'EXTREME', year: 2011 },
-    { label: '⚡ Carry Trade Bomb', description: 'BOJ hike triggers\nmassive JPY squeeze — 2024', startIdx: 205, endIdx: 230, severity: 'SEVERE', year: 2024 },
+    { label: '🗻 Krisis JPY 1998', description: 'Yen menguat ke 147\ncarry trade terurai', startIdx: 5, endIdx: 20, severity: 'SEVERE', year: 1998 },
+    { label: '🌊 Titik Dekade Hilang', description: 'JPY terkuat di 75\nusai gempa 2011', startIdx: 70, endIdx: 90, severity: 'EXTREME', year: 2011 },
+    { label: '⚡ Ledakan Carry Trade', description: 'Kenaikan BOJ memicu\nsqueeze JPY besar — 2024', startIdx: 205, endIdx: 230, severity: 'SEVERE', year: 2024 },
   ],
   'GBP/JPY': [
-    { label: '💔 Brexit Cliff', description: 'GBP/JPY plunged from 148\nto 130 overnight — 2016', startIdx: 100, endIdx: 125, severity: 'EXTREME', year: 2016 },
-    { label: '🌊 COVID Flash', description: 'Risk-off surge in JPY —\nGBP/JPY crashed — 2020', startIdx: 152, endIdx: 168, severity: 'SEVERE', year: 2020 },
+    { label: '💔 Tebing Brexit', description: 'GBP/JPY jatuh dari 148\nke 130 semalam — 2016', startIdx: 100, endIdx: 125, severity: 'EXTREME', year: 2016 },
+    { label: '🌊 Kejut COVID', description: 'Risk-off dorong JPY —\nGBP/JPY jatuh — 2020', startIdx: 152, endIdx: 168, severity: 'SEVERE', year: 2020 },
   ],
   'AUD/USD': [
-    { label: '⛏️ Mining Boom Peak', description: 'AUD > USD for first time\nin decades — 2011', startIdx: 72, endIdx: 92, severity: 'MODERATE', year: 2011 },
-    { label: '🌊 COVID Low', description: 'Commodity demand crash\nhits Aussie — 2020', startIdx: 152, endIdx: 168, severity: 'SEVERE', year: 2020 },
+    { label: '⛏️ Puncak Boom Tambang', description: 'AUD > USD pertama kali\ndalam dekade — 2011', startIdx: 72, endIdx: 92, severity: 'MODERATE', year: 2011 },
+    { label: '🌊 Titik Rendah COVID', description: 'Permintaan komoditas jatuh\nmenekan Aussie — 2020', startIdx: 152, endIdx: 168, severity: 'SEVERE', year: 2020 },
   ],
 };
 
-export function getCrisisZones(pair: string): CrisisZone[] {
-  return CRISIS_ZONES[pair] || [];
+type CrisisTimeRange = 'LIVE' | '1D' | '5D' | '1M' | '1Y' | 'MAX';
+
+function getRangeWindowMs(timeRange: CrisisTimeRange): number | null {
+  switch (timeRange) {
+    case 'MAX':
+      return null;
+    case '1Y':
+      return 366 * 24 * 60 * 60 * 1000;
+    case '1M':
+      return 31 * 24 * 60 * 60 * 1000;
+    case '5D':
+      return 5 * 24 * 60 * 60 * 1000;
+    case '1D':
+    case 'LIVE':
+      return 24 * 60 * 60 * 1000;
+  }
 }
 
+function crisisAnchorDate(zone: CrisisZone): number {
+  return new Date(Date.UTC(zone.year, 5, 1)).getTime();
+}
+
+export function getCrisisZones(pair: string, timeRange: CrisisTimeRange = 'MAX', now: number = Date.now()): CrisisZone[] {
+  const zones = CRISIS_ZONES[pair] || [];
+  const windowMs = getRangeWindowMs(timeRange);
+
+  if (windowMs === null) return zones;
+
+  const rangeStart = now - windowMs;
+  return zones.filter((zone) => {
+    const eventTime = crisisAnchorDate(zone);
+    return eventTime >= rangeStart && eventTime <= now;
+  });
+}

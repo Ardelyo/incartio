@@ -12,19 +12,19 @@ export const PreRunBriefing: React.FC = () => {
     if (currencyPair === 'USD/IDR') return {
       title: 'Krisis Moneter Asia',
       desc: 'Bersiaplah menghadapi fluktuasi tajam Rupiah. Pantau zona 1997-1998 untuk volatilitas ekstrem.',
-      difficulty: 'HARD',
+      difficulty: 'SULIT',
       color: '#ea4335'
     };
     if (currencyPair === 'BTC/USD') return {
-      title: 'Crypto Rollercoaster',
+      title: 'Rollercoaster Kripto',
       desc: 'Medan paling curam dan berbahaya. Hati-hati dengan jurang crypto winter.',
-      difficulty: 'EXTREME',
+      difficulty: 'EKSTREM',
       color: '#fbbc04'
     };
     return {
-      title: 'Market Reguler',
+      title: 'Pasar Reguler',
       desc: 'Perjalanan standar melintasi sejarah pergerakan harga.',
-      difficulty: 'MEDIUM',
+      difficulty: 'SEDANG',
       color: '#81c995'
     };
   };
@@ -48,7 +48,7 @@ export const PreRunBriefing: React.FC = () => {
             <h1 className="text-3xl font-bold text-white tracking-tight">{currencyPair}</h1>
           </div>
           <div className="text-right">
-            <div className="text-xs text-[#9aa0a6] uppercase font-bold mb-1">Timeframe</div>
+            <div className="text-xs text-[#9aa0a6] uppercase font-bold mb-1">Rentang Waktu</div>
             <div className="px-3 py-1 rounded-full bg-[#3c4043] text-white font-bold text-sm">{timeRange}</div>
           </div>
         </div>

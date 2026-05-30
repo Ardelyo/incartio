@@ -144,30 +144,25 @@ export const GameCanvas: React.FC = () => {
   ];
 
   const jpyTips = [
-    "💴 円安（えんやす）対策には、ドルなどの外貨資産への分散がおすすめ！",
-    "インフレに負けないために、貯蓄から投資（NISA等）へ賢くシフトしよう！",
-    "ガソリンは手元のキャッシュ。常に流動性とキャッシュフローを意識！",
-    "複利の力は宇宙最強のエネルギー！コツコツと長期積立投資を継続しよう。",
-    "固定費（通信費や保険見直し）の削減が、じわじわ効く最強 of防衛策！",
-    "万が一に備え、生活費3〜6ヶ月分の緊急生活資金を常にキープ！",
-    "相場の下落はつみたての好機！ドル・コスト平均法で平均購入単価を抑えよう。",
-    "最強の投資は「自己投資」！金融知識（マネーリテラシー）を身につけよう。",
-    "資産（お金を生むもの）を買い、負債（お金を奪うもの）を減らすのが基本です！"
+    "?? Saat Yen melemah, pelaku pasar sering mencari aset lindung nilai lintas negara.",
+    "?? Carry trade bisa menguatkan tren, tapi pembalikannya sering sangat cepat.",
+    "?? Kebijakan bank sentral Jepang dapat mengguncang pasangan JPY dalam hitungan jam.",
+    "?? Jangan cuma lihat arah harga; pahami juga alasan makro di balik gerakannya.",
+    "??? Gunakan ukuran posisi yang masuk akal saat pair JPY sedang sangat volatil.",
   ];
-
   const enTips = [
-    "💸 Inflation eats your purchasing power! Fight it with productive growth assets.",
-    "⛽ Fuel is like liquid cashflow—always keep a buffer for market bumps!",
-    "📉 Market dip? Dollar-Cost Averaging (DCA) helps average out your trade entries.",
-    "🏦 High interest rates make high-yield savings accounts & bonds secure!",
-    "⚖️ Diversification spreads risk. Never put all your cash in a single asset!",
-    "🚀 Compound interest is the 8th wonder of the world. Capitalize early!",
-    "🥑 Trim subscription bloat! Small unrecognized leaks sink major financial ships.",
-    "📊 Stick to the 50/30/20 budget framework for pristine portfolio health!",
-    "🎓 Investment in financial knowledge always pays the absolute highest dividends.",
-    "🏠 Buy assets that put cash in your pocket, not liabilities that pull it out!",
-    "💳 Never carry high-interest credit card debt; it compiles negatively back against you.",
-    "🌐 Protect your wealth in periods of volatility with resilient global equities and hard assets."
+    "?? Inflasi menggerus daya beli. Lawan dengan aset produktif dan rencana jangka panjang.",
+    "? Bensin seperti arus kas: selalu sisakan cadangan saat pasar bergelombang.",
+    "?? Harga turun bukan selalu musibah; strategi bertahap bisa menurunkan harga rata-rata.",
+    "?? Suku bunga tinggi membuat instrumen pendapatan tetap lebih menarik untuk dipantau.",
+    "?? Diversifikasi membantu menyebar risiko. Jangan taruh semua dana di satu aset.",
+    "?? Efek majemuk bekerja paling kuat ketika kamu mulai lebih awal dan konsisten.",
+    "?? Potong langganan yang tidak perlu. Kebocoran kecil bisa jadi beban besar.",
+    "?? Pakai kerangka 50/30/20 agar belanja, hiburan, dan investasi tetap seimbang.",
+    "?? Literasi finansial adalah investasi diri yang hasilnya ikut kamu bawa ke mana-mana.",
+    "?? Utamakan aset yang menghasilkan, bukan liabilitas yang menguras kantong.",
+    "?? Hindari utang berbunga tinggi; bunganya bisa mengejar lebih cepat dari mobilmu.",
+    "?? Saat volatil, perlindungan bisa datang dari aset global dan kas yang cukup."
   ];
 
   const dialogueTipRef = useRef({
@@ -304,7 +299,7 @@ export const GameCanvas: React.FC = () => {
          if (store.timeRange === '5D') daysToFetch = 5;
          if (store.timeRange === '1Y') daysToFetch = 60; // Approximate
          
-         realData = await fetchHistoricalDataPoints(store.currencyPair, daysToFetch, store.apiProvider, store.apiKey);
+         realData = await fetchHistoricalDataPoints(store.currencyPair, daysToFetch, store.apiProvider);
       }
       
       if (!active) return;
@@ -327,8 +322,11 @@ export const GameCanvas: React.FC = () => {
 
       maxMinRef.current = { maxIdx, minIdx, maxPrice, minPrice };
 
-      // Load crisis zones for this pair
-      crisisZonesRef.current = getCrisisZones(store.currencyPair);
+      // Crisis zones are synchronized to the selected time range.
+      // MAX shows historical events; shorter ranges only show nearby events.
+      crisisZonesRef.current = getCrisisZones(store.currencyPair, store.timeRange);
+      activeCrisisRef.current = null;
+      crisisAlertTimerRef.current = 0;
       
       // Y maps to 10% to 90% of actual canvas height to make it less flat
       pointsRef.current = rawData.map((d, i) => {
@@ -421,7 +419,6 @@ export const GameCanvas: React.FC = () => {
         selectedList: list
       };
 
-      store.resetRun();
       store.updateMarketData(lastPoint.price, lastPoint.price - prevPoint.price);
       setDataLoading(false);
     };
@@ -607,7 +604,7 @@ export const GameCanvas: React.FC = () => {
           store.updateGameStats({ crisisZonesSurvived: useGameStore.getState().crisisZonesSurvived + 1 });
           spawnParticles({ x: car.x, y: car.y - 50, count: 30, type: 'confetti', color: ['#4285f4','#34a853','#fbbc05','#ea4335','#a142f4'], speedMin: 80, speedMax: 220, sizeMin: 3, sizeMax: 7, gravity: 120 });
           spawnParticles({ x: car.x, y: car.y - 60, count: 1, type: 'text', color: '#fbbc04', text: '✅ Survived! +200', speedMin: 20, speedMax: 40, sizeMin: 14, sizeMax: 14, gravity: -50 });
-          setActiveAlert({ text: `✅ Crisis Zone Survived! +200 Poin!`, type: 'GOOD', id: Math.random() });
+          setActiveAlert({ text: `✅ Zona krisis dilewati! +200 Poin!`, type: 'GOOD', id: Math.random() });
           store.setCaruState('EXCITED');
           playCheckpointSFX();
         }
@@ -767,7 +764,7 @@ export const GameCanvas: React.FC = () => {
                  
                  const currentRunCoins = useGameStore.getState().runCoins;
                  if (currentRunCoins >= 50) {
-                    store.addAchievement('Wealth Builder');
+                    store.addAchievement('Pembangun Kekayaan');
                  }
 
                  store.setCaruState('EXCITED');
@@ -973,7 +970,7 @@ export const GameCanvas: React.FC = () => {
         // ── Run finish: reached near end of base track (index 240+) ──
         if (computedIndex >= 238 && useGameStore.getState().gameScreen === 'PLAYING') {
           store.updateGameStats({ fuel: Math.floor(car.fuel), score: car.score, distance: Math.floor(car.distanceX / 2.5) });
-          store.addAchievement('Market Survivor');
+          store.addAchievement('Penyintas Pasar');
           store.finishRun();
         }
       }
@@ -2084,7 +2081,7 @@ export const GameCanvas: React.FC = () => {
       {dataLoading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center z-50 bg-[#202124]">
             <div className="w-8 h-8 border-4 border-[#8ab4f8] border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-[#9aa0a6] text-sm animate-pulse">Loading Historical Data...</p>
+            <p className="text-[#9aa0a6] text-sm animate-pulse">Memuat Data Historis...</p>
         </div>
       )}
 

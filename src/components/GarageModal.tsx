@@ -9,11 +9,11 @@ interface GarageModalProps {
 }
 
 const SKINS = [
-  { id: 'default', name: 'Golden Caru', reqText: 'Default Skin', icon: '🐻', cost: 0 },
-  { id: 'panda', name: 'Panda Caru', reqText: '10,000 Coins', icon: '🐼', cost: 10000 },
-  { id: 'fox', name: 'Fox Caru', reqText: '50,000 Coins', icon: '🦊', cost: 50000 },
-  { id: 'tiger', name: 'Tiger Caru', reqText: '100,000 Coins', icon: '🐯', cost: 100000 },
-  { id: 'crown', name: 'Crown Caru', reqText: '250,000 Coins', icon: '👑', cost: 250000 },
+  { id: 'default', name: 'Caru Emas', reqText: 'Skin Bawaan', icon: '🐻', cost: 0 },
+  { id: 'panda', name: 'Caru Panda', reqText: '10.000 Koin', icon: '🐼', cost: 10000 },
+  { id: 'fox', name: 'Caru Rubah', reqText: '50.000 Koin', icon: '🦊', cost: 50000 },
+  { id: 'tiger', name: 'Caru Macan', reqText: '100.000 Koin', icon: '🐯', cost: 100000 },
+  { id: 'crown', name: 'Caru Mahkota', reqText: '250.000 Koin', icon: '👑', cost: 250000 },
 ];
 
 export const GarageModal: React.FC<GarageModalProps> = ({ isOpen, onClose }) => {
@@ -27,7 +27,7 @@ export const GarageModal: React.FC<GarageModalProps> = ({ isOpen, onClose }) => 
       store.awardCoins(-cost);
       store.unlockSkin(skinId);
       store.selectSkin(skinId);
-      store.addAchievement(`Unlocked ${SKINS.find(s => s.id === skinId)?.name}!`);
+      store.addAchievement(`${SKINS.find(s => s.id === skinId)?.name} terbuka!`);
     }
   };
 
@@ -47,7 +47,7 @@ export const GarageModal: React.FC<GarageModalProps> = ({ isOpen, onClose }) => 
         >
           <div className="p-4 border-b border-[#3c4043] flex justify-between items-center bg-[#202124]">
             <h2 className="text-xl font-bold font-['Space_Grotesk'] tracking-tight flex items-center gap-2">
-              🏎️ Caru's Garage
+              🏎️ Garasi Caru
             </h2>
             <button onClick={onClose} className="p-2 hover:bg-[#3c4043] rounded-full transition-colors text-gray-400 hover:text-white">
               <X size={20} />
@@ -55,7 +55,7 @@ export const GarageModal: React.FC<GarageModalProps> = ({ isOpen, onClose }) => 
           </div>
 
           <div className="p-4 bg-[#202124]/50 border-b border-[#3c4043] flex justify-between items-center text-sm">
-            <span className="text-gray-400">Total Coins Available</span>
+            <span className="text-gray-400">Total Koin Tersedia</span>
             <span className="font-mono font-bold text-[#fbbc04]">💰 {store.totalCoins.toLocaleString()}</span>
           </div>
 
@@ -80,7 +80,7 @@ export const GarageModal: React.FC<GarageModalProps> = ({ isOpen, onClose }) => 
                     <div>
                       <div className="font-bold text-white text-base">{skin.name}</div>
                       <div className="text-xs text-gray-400 font-mono">
-                        {isUnlocked ? 'Unlocked' : skin.reqText}
+                        {isUnlocked ? 'Terbuka' : skin.reqText}
                       </div>
                     </div>
                   </div>
@@ -88,14 +88,14 @@ export const GarageModal: React.FC<GarageModalProps> = ({ isOpen, onClose }) => 
                   <div>
                     {isSelected ? (
                       <div className="bg-[#4285f4] text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                        <Check size={14} /> EQUIPPED
+                        <Check size={14} /> DIPAKAI
                       </div>
                     ) : isUnlocked ? (
                       <button
                         onClick={() => store.selectSkin(skin.id)}
                         className="bg-[#3c4043] hover:bg-[#5f6368] text-white px-4 py-1.5 rounded-full text-xs font-bold transition-colors"
                       >
-                        EQUIP
+                        PAKAI
                       </button>
                     ) : (
                       <button
@@ -105,7 +105,7 @@ export const GarageModal: React.FC<GarageModalProps> = ({ isOpen, onClose }) => 
                           ${canAfford ? 'bg-[#fbbc04] text-[#202124] hover:bg-[#f29900]' : 'bg-[#3c4043] text-gray-500 cursor-not-allowed'}
                         `}
                       >
-                        {canAfford ? 'UNLOCK' : <><Lock size={12} /> {skin.cost.toLocaleString()}</>}
+                        {canAfford ? 'BUKA' : <><Lock size={12} /> {skin.cost.toLocaleString('id-ID')}</>}
                       </button>
                     )}
                   </div>

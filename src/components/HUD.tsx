@@ -74,22 +74,22 @@ export const HUD: React.FC = () => {
 
       {/* ── Mobile touch controls (bottom) ── */}
       <div className="absolute bottom-24 left-0 right-0 z-40 flex justify-between items-end px-4 pointer-events-none md:hidden">
-        {/* Left: Brake */}
+        {/* Left: Rem */}
         <button
           {...makeTouchHandlers('left')}
           className="pointer-events-auto w-20 h-16 rounded-2xl bg-[#292a2d]/80 border-2 border-[#3c4043] backdrop-blur-sm flex flex-col items-center justify-center gap-1 active:bg-[#3c4043] active:border-[#8ab4f8] select-none touch-none"
         >
           <span className="text-xl">◀</span>
-          <span className="text-[9px] text-[#9aa0a6] font-mono uppercase">Brake</span>
+          <span className="text-[9px] text-[#9aa0a6] font-mono uppercase">Rem</span>
         </button>
 
-        {/* Center: Jump */}
+        {/* Center: Lompat */}
         <button
           {...makeTouchHandlers('jump')}
           className="pointer-events-auto w-16 h-16 rounded-full bg-[#8ab4f8]/20 border-2 border-[#8ab4f8]/40 backdrop-blur-sm flex flex-col items-center justify-center gap-1 active:bg-[#8ab4f8]/40 select-none touch-none"
         >
           <span className="text-xl">▲</span>
-          <span className="text-[8px] text-[#8ab4f8] font-mono uppercase">Jump</span>
+          <span className="text-[8px] text-[#8ab4f8] font-mono uppercase">Lompat</span>
         </button>
 
         {/* Right: Gas */}
@@ -104,9 +104,9 @@ export const HUD: React.FC = () => {
 
       {/* Desktop controls hint */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30 hidden md:flex items-center gap-4 text-[9px] text-[#3c4043] font-mono select-none pointer-events-none">
-        <span>◀ A — Brake</span>
+        <span>◀ A — Rem</span>
         <span>▶ D — Gas</span>
-        <span>▲ W Space — Jump</span>
+        <span>▲ W Spasi — Lompat</span>
       </div>
 
       <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />

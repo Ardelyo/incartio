@@ -47,11 +47,11 @@ export const Header: React.FC = () => {
   const timeStr = currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' });
   
   const handleShare = async () => {
-    const text = 'Mainkan Incartion — game balapan seru melewati sejarah krisis moneter dan chart market asli! 🏎️📈';
-    const url = 'https://incartion.game';
+    const text = 'Mainkan FINCARS - game balapan finansial buatan anak bangsa, melaju di chart market asli!';
+    const url = 'https://fincars.game';
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Incartion', text, url });
+        await navigator.share({ title: 'FINCARS', text, url });
         return;
       } catch (e) {}
     }
@@ -67,7 +67,7 @@ export const Header: React.FC = () => {
         <div className="flex w-full justify-between items-start">
           <div className="flex items-center gap-1.5 md:gap-2 text-[#9aa0a6] text-xs md:text-sm">
             <span className="truncate max-w-[120px] md:max-w-none">{baseName}</span>
-            <span>equals</span>
+            <span>setara</span>
           </div>
           <div className="flex items-center gap-2 pointer-events-auto shrink-0 animate-fade-in">
             <button 
@@ -84,7 +84,7 @@ export const Header: React.FC = () => {
             >
               {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             </button>
-            <button onClick={handleShare} className="w-8 h-8 rounded-full bg-[#303134] text-white flex items-center justify-center hover:bg-[#3c4043] transition-colors cursor-pointer" title="Share Game">
+            <button onClick={handleShare} className="w-8 h-8 rounded-full bg-[#303134] text-white flex items-center justify-center hover:bg-[#3c4043] transition-colors cursor-pointer" title="Bagikan Game">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
             </button>
           </div>
@@ -115,7 +115,7 @@ export const Header: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-1 mt-1.5 md:mt-2 text-[10px] md:text-xs text-[#9aa0a6]">
-          <span>{dateStr}, {timeStr} UTC · Disclaimer</span>
+          <span>{dateStr}, {timeStr} UTC · Penyangkalan</span>
         </div>
         
         <div className="w-full mt-3 md:mt-4 flex items-center gap-1 md:gap-4 pointer-events-auto border-b border-[#3c4043] pb-2 text-sm font-medium overflow-x-auto scrollbar-hide">
@@ -197,7 +197,7 @@ export const Header: React.FC = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-semibold text-white group-hover:text-[#8ab4f8] transition-colors">#ockoding</h4>
-                      <p className="text-xs text-[#9aa0a6] mt-0.5">Creator Hashtag</p>
+                      <p className="text-xs text-[#9aa0a6] mt-0.5">Tagar Kreator</p>
                     </div>
                   </div>
                   <ExternalLink size={14} className="text-[#5f6368] group-hover:text-[#8ab4f8] transition-colors" />
@@ -219,7 +219,7 @@ export const Header: React.FC = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-semibold text-white group-hover:text-[#8ab4f8] transition-colors">#ourcreativityidn</h4>
-                      <p className="text-xs text-[#9aa0a6] mt-0.5">Creative Space Hashtag</p>
+                      <p className="text-xs text-[#9aa0a6] mt-0.5">Tagar Ruang Kreatif</p>
                     </div>
                   </div>
                   <ExternalLink size={14} className="text-[#5f6368] group-hover:text-[#8ab4f8] transition-colors" />
@@ -241,7 +241,7 @@ export const Header: React.FC = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-semibold text-white group-hover:text-pink-400 transition-colors">@ourcreativity.ofc</h4>
-                      <p className="text-xs text-[#9aa0a6] mt-0.5">Official Instagram Community</p>
+                      <p className="text-xs text-[#9aa0a6] mt-0.5">Instagram Resmi Komunitas</p>
                     </div>
                   </div>
                   <ExternalLink size={14} className="text-[#5f6368] group-hover:text-pink-400 transition-colors" />
@@ -304,7 +304,7 @@ export const TimeSelector: React.FC = () => {
                         : "text-[#9aa0a6] hover:bg-[#3c4043]/50"
                   )}
                 >
-                    {range === 'MAX' ? 'Max' : range}
+                    {range === 'MAX' ? 'Maks' : range}
                 </button>
             ))}
         </>

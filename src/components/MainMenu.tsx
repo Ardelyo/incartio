@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore, TimeRange } from '../store';
 import { PAIR_PROFILES, getCrisisZones } from '../utils/marketData';
-import { Volume2, VolumeX, Info, Instagram, Globe, X, Hash, ExternalLink, User, Settings } from 'lucide-react';
+import { Coffee, Volume2, VolumeX, Info, Instagram, Globe, X, Hash, ExternalLink, User, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { GarageModal } from './GarageModal';
@@ -17,20 +17,20 @@ const PAIR_FLAGS: Record<string, string> = {
 };
 
 const PAIR_DIFFICULTY: Record<string, { level: string; color: string; bars: number }> = {
-  'USD/IDR': { level: 'HARD', color: 'text-[#ea4335]', bars: 4 },
-  'EUR/USD': { level: 'EASY', color: 'text-[#34a853]', bars: 1 },
-  'GBP/JPY': { level: 'EXTREME', color: 'text-[#f29900]', bars: 5 },
-  'USD/JPY': { level: 'MEDIUM', color: 'text-[#fbbc04]', bars: 3 },
-  'BTC/USD': { level: 'EXTREME', color: 'text-[#f29900]', bars: 5 },
-  'AUD/USD': { level: 'MEDIUM', color: 'text-[#fbbc04]', bars: 2 },
+  'USD/IDR': { level: 'SULIT', color: 'text-[#ea4335]', bars: 4 },
+  'EUR/USD': { level: 'MUDAH', color: 'text-[#34a853]', bars: 1 },
+  'GBP/JPY': { level: 'EKSTREM', color: 'text-[#f29900]', bars: 5 },
+  'USD/JPY': { level: 'SEDANG', color: 'text-[#fbbc04]', bars: 3 },
+  'BTC/USD': { level: 'EKSTREM', color: 'text-[#f29900]', bars: 5 },
+  'AUD/USD': { level: 'SEDANG', color: 'text-[#fbbc04]', bars: 2 },
 };
 
 const TIME_LABELS: Record<TimeRange, string> = {
-  '1D': '1 Day',
-  '5D': '5 Days',
-  '1M': '1 Month',
-  '1Y': '1 Year',
-  'MAX': 'MAX History',
+  '1D': '1 Hari',
+  '5D': '5 Hari',
+  '1M': '1 Bulan',
+  '1Y': '1 Tahun',
+  'MAX': 'Riwayat MAX',
   'LIVE': 'LIVE',
 };
 
@@ -38,13 +38,13 @@ interface CurrencyNames {
   [key: string]: string;
 }
 const CURRENCY_NAMES: CurrencyNames = {
-  USD: 'US Dollar',
-  IDR: 'Indonesian Rupiah',
+  USD: 'Dolar AS',
+  IDR: 'Rupiah Indonesia',
   EUR: 'Euro',
-  GBP: 'British Pound',
-  JPY: 'Japanese Yen',
+  GBP: 'Pound Inggris',
+  JPY: 'Yen Jepang',
   BTC: 'Bitcoin',
-  AUD: 'Australian Dollar',
+  AUD: 'Dolar Australia',
 };
 
 // Animated canvas background (mini chart preview)
@@ -108,7 +108,7 @@ export const MainMenu: React.FC = () => {
   const [showApiSettings, setShowApiSettings] = useState(false);
 
   const pairs = Object.values(PAIR_PROFILES);
-  const crisisZones = getCrisisZones(selectedPair);
+  const crisisZones = getCrisisZones(selectedPair, selectedRange);
   const diff = PAIR_DIFFICULTY[selectedPair] || PAIR_DIFFICULTY['USD/IDR'];
   const [base, target] = selectedPair.split('/');
 
@@ -135,27 +135,28 @@ export const MainMenu: React.FC = () => {
         <button
           onClick={() => setShowApiSettings(true)}
           className="w-9 h-9 rounded-full bg-[#303134] text-[#8ab4f8] flex items-center justify-center hover:bg-[#3c4043] transition-colors"
-          title="API Settings"
+          title="Pengaturan API"
         >
           <Settings size={16} />
         </button>
         <button
           onClick={() => setShowGarage(true)}
           className="w-9 h-9 rounded-full bg-[#303134] text-[#8ab4f8] flex items-center justify-center hover:bg-[#3c4043] transition-colors"
-          title="Garage & Skins"
+          title="Garasi & Skin"
         >
           <User size={16} />
         </button>
         <button
           onClick={() => store.toggleSound()}
           className="w-9 h-9 rounded-full bg-[#303134] text-[#8ab4f8] flex items-center justify-center hover:bg-[#3c4043] transition-colors"
-          title={store.soundEnabled ? 'Mute' : 'Unmute'}
+          title={store.soundEnabled ? 'Matikan suara' : 'Nyalakan suara'}
         >
           {store.soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
         </button>
         <button
           onClick={() => setShowCredits(true)}
           className="w-9 h-9 rounded-full bg-[#303134] text-[#8ab4f8] flex items-center justify-center hover:bg-[#3c4043] transition-colors"
+          title="Info Kreator"
         >
           <Info size={16} />
         </button>
@@ -170,7 +171,7 @@ export const MainMenu: React.FC = () => {
         >
           <span className="text-[#fbbc04]">🪙</span>
           <span className="text-[#e8eaed] font-semibold">{store.totalCoins.toLocaleString()}</span>
-          <span className="text-[#9aa0a6]">total coins</span>
+          <span className="text-[#9aa0a6]">koin total</span>
         </motion.div>
       )}
 
@@ -187,9 +188,10 @@ export const MainMenu: React.FC = () => {
             <div className="text-6xl drop-shadow-lg select-none">🦊</div>
           </div>
           <h1 className="text-4xl font-black tracking-tight leading-none">
-            <span className="text-white">INCAR</span><span className="text-[#8ab4f8]">TION</span>
+            <span className="text-white">FIN</span><span className="text-[#8ab4f8]">CARS</span>
           </h1>
-          <p className="text-[#9aa0a6] text-sm mt-2 tracking-wide">Drive through market history. Learn as you go.</p>
+          <p className="text-[#9aa0a6] text-sm mt-2 tracking-wide">Jelajahi sejarah pasar. Belajar sambil melaju.</p>
+          <p className="text-[10px] text-[#81c995] uppercase tracking-[0.22em] mt-2 font-bold">Buatan Anak Bangsa</p>
         </motion.div>
 
         {/* Track Selector */}
@@ -200,7 +202,7 @@ export const MainMenu: React.FC = () => {
           className="bg-[#292a2d] rounded-2xl border border-[#3c4043] overflow-hidden"
         >
           <div className="px-4 pt-4 pb-2">
-            <p className="text-[10px] uppercase tracking-widest text-[#5f6368] font-semibold mb-2">Select Track</p>
+            <p className="text-[10px] uppercase tracking-widest text-[#5f6368] font-semibold mb-2">Pilih Lintasan</p>
             <div className="flex flex-wrap gap-2">
               {pairs.map(p => (
                 <button
@@ -248,7 +250,9 @@ export const MainMenu: React.FC = () => {
               {/* Crisis zones */}
               {crisisZones.length > 0 && (
                 <div className="mt-3 space-y-1.5">
-                  <p className="text-[9px] uppercase tracking-widest text-[#5f6368] font-semibold">Historical Crisis Zones</p>
+                  <p className="text-[9px] uppercase tracking-widest text-[#5f6368] font-semibold">
+                    {selectedRange === 'MAX' ? 'Zona Krisis Historis' : 'Peristiwa Relevan di Rentang Ini'}
+                  </p>
                   {crisisZones.map((z, i) => (
                     <div key={i} className={clsx(
                       'flex items-center gap-2 text-[10px] rounded-lg px-2.5 py-1.5',
@@ -273,7 +277,7 @@ export const MainMenu: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="bg-[#292a2d] rounded-2xl border border-[#3c4043] p-4"
         >
-          <p className="text-[10px] uppercase tracking-widest text-[#5f6368] font-semibold mb-2.5">Time Range</p>
+          <p className="text-[10px] uppercase tracking-widest text-[#5f6368] font-semibold mb-2.5">Rentang Waktu</p>
           <div className="flex flex-wrap gap-2">
             {ranges.map(r => (
               <button
@@ -303,7 +307,7 @@ export const MainMenu: React.FC = () => {
           onClick={handlePlay}
           className="w-full py-4 rounded-2xl bg-[#8ab4f8] text-[#202124] font-black text-lg tracking-tight shadow-lg hover:bg-[#aecbfa] active:scale-95 transition-all duration-150 flex items-center justify-center gap-2"
         >
-          <span>🏎️ START RACE</span>
+          <span>🏎️ MULAI BALAPAN</span>
         </motion.button>
 
         {/* Controls hint */}
@@ -313,8 +317,8 @@ export const MainMenu: React.FC = () => {
           transition={{ delay: 0.45 }}
           className="flex justify-center gap-6 text-[10px] text-[#5f6368] font-mono"
         >
-          <span>◀ ▶ or A D — Drive</span>
-          <span>▲ W Space — Jump</span>
+          <span>◀ ▶ atau A D — Gas/Rem</span>
+          <span>▲ W Spasi — Lompat</span>
         </motion.div>
       </div>
 
@@ -348,7 +352,7 @@ export const MainMenu: React.FC = () => {
                   <div className="text-3xl">🦊</div>
                   <div>
                     <h3 className="font-bold text-white">Kreator & Komunitas</h3>
-                    <p className="text-xs text-[#9aa0a6]">Tentang game & komunitas</p>
+                    <p className="text-xs text-[#9aa0a6]">Buatan anak bangsa, tumbuh bareng komunitas</p>
                   </div>
                 </div>
                 <p className="text-sm text-[#e8eaed] mb-4 leading-relaxed">
@@ -356,10 +360,11 @@ export const MainMenu: React.FC = () => {
                 </p>
                 <div className="space-y-3">
                   {[
-                    { icon: <Hash size={16} />, label: '#ockoding', sub: 'Creator Hashtag', href: 'https://instagram.com/explore/tags/ockoding', color: 'indigo' },
-                    { icon: <Hash size={16} />, label: '#ourcreativityidn', sub: 'Creative Space', href: 'https://instagram.com/explore/tags/ourcreativityidn', color: 'teal' },
-                    { icon: <Instagram size={16} />, label: '@ourcreativity.ofc', sub: 'Official Instagram', href: 'https://instagram.com/ourcreativity.ofc', color: 'pink' },
+                    { icon: <Hash size={16} />, label: '#ockoding', sub: 'Tagar kreator', href: 'https://instagram.com/explore/tags/ockoding', color: 'indigo' },
+                    { icon: <Hash size={16} />, label: '#ourcreativityidn', sub: 'Ruang kreatif', href: 'https://instagram.com/explore/tags/ourcreativityidn', color: 'teal' },
+                    { icon: <Instagram size={16} />, label: '@ourcreativity.ofc', sub: 'Instagram resmi', href: 'https://instagram.com/ourcreativity.ofc', color: 'pink' },
                     { icon: <Globe size={16} />, label: 'OurCreativity.vercel.app', sub: 'Web Komunitas', href: 'https://OurCreativity.vercel.app', color: 'green' },
+                    { icon: <Coffee size={16} />, label: 'saweria.co/ardelyo', sub: 'Dukung secangkir kopi', href: 'https://saweria.co/ardelyo', color: 'yellow' },
                   ].map((item, i) => (
                     <a
                       key={i}
