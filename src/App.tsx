@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { GameCanvas } from './components/GameCanvas';
 import { Header } from './components/Header';
 import { HUD } from './components/HUD';
@@ -60,6 +61,8 @@ export default function App() {
       <TermsModal isOpen={isTermsOpen} onClose={handleAcceptTerms} />
       
       <BrandingFooter />
+      
+      <Analytics />
     </div>
   );
 }
