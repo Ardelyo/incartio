@@ -1,5 +1,5 @@
 {
-  "name": "Incartion",
+  "name": "Fincars",
   "description": "A mobile-first financial game where real-time currency exchange rate graphs become physical terrain that your car drives on.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
