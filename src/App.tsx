@@ -7,10 +7,13 @@ import { MainMenu } from './components/MainMenu';
 import { RunComplete } from './components/RunComplete';
 import { PreRunBriefing } from './components/PreRunBriefing';
 import { AchievementToaster } from './components/AchievementToaster';
+import { SplashScreen } from './components/SplashScreen';
+import { BrandingFooter } from './components/BrandingFooter';
 import { useGameStore } from './store';
 
 export default function App() {
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [splashComplete, setSplashComplete] = useState(false);
   const gameScreen = useGameStore(s => s.gameScreen);
 
   // Prevent context menu on long press
@@ -35,6 +38,8 @@ export default function App() {
 
   return (
     <div className="fixed inset-0 bg-[#202124] text-white overflow-hidden font-sans">
+      <SplashScreen onComplete={() => setSplashComplete(true)} />
+      
       <AchievementToaster />
       
       {(gameScreen === 'PLAYING' || gameScreen === 'COMPLETE') && <Header />}
@@ -53,6 +58,8 @@ export default function App() {
       {gameScreen === 'COMPLETE' && <RunComplete />}
       
       <TermsModal isOpen={isTermsOpen} onClose={handleAcceptTerms} />
+      
+      <BrandingFooter />
     </div>
   );
 }
